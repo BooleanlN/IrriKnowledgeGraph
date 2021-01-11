@@ -9,6 +9,7 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import random
 
 
 import torch.optim as optim
@@ -21,6 +22,16 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import accuracy_score
 from itertools import chain
 import Constants
+
+
+def setup_seed(seed):
+    # 设置随机数种子
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.backends.cudnn.deterministic = True
+
 
 def cal_loss(pred, actual):
     #pred, actual 均包含首尾<cls><sep>以及pad 标签
@@ -218,8 +229,8 @@ def main():
 
     parser.add_argument('-data', default='process_data.pth')
 
-    parser.add_argument('-epoch', type=int, default=35)
-    parser.add_argument('-batch_size', type=int, default=32)
+    parser.add_argument('-epoch', type=int, default=2)
+    parser.add_argument('-batch_size', type=int, default=64)
 
     parser.add_argument('-out_classes', type=int, default=2)
     parser.add_argument('-d_word_vec', type=int, default=256)
@@ -244,6 +255,10 @@ def main():
 
     parser.add_argument('-learning_rate', type=float, default=0.001)
 
+    parser.add_argument('-random_seed', type=int, default=66)
+
+
+
     opt = parser.parse_args()
     opt.cuda = not opt.no_cuda
     opt.d_word_vec = opt.d_model
@@ -252,11 +267,14 @@ def main():
     data = torch.load(opt.data)
     #opt.max_token_seq_len = data['settings'].max_token_seq_len  # include the <s> and </s>  ,here just include  </s>
     opt.out_classes = data['lable_classes']
+
     train_loader,valid_loader,test_loader = prepare_dataloaders(data, opt)
 
     #========= Preparing Model =========#
 
     print(opt)
+
+    setup_seed(opt.random_seed)
 
     device = torch.device('cuda' if opt.cuda else 'cpu')
 
@@ -306,11 +324,13 @@ if __name__ == '__main__':
     # import os
     # os.environ["CUDA_VISIBLE_DEVICES"] = "1"
     main()
-  #   #[ Epoch 27 ]
-  # - (Training)   loss:  0.00001, accu: 98.555 %, f1: 90.580 %,elapse: 0.575 min
-  # - (Validation)   loss:  0.00001, accu: 98.741 %, f1: 94.971 %,elapse: 0.058 min
-  #   - [Info] The checkpoint file has been updated.
-  #  - (Training)   loss:  0.00001, accu: 98.473 %, f1: 89.663 %,elapse: 0.824 min
-  # - (Validation)   loss:  0.00002, accu: 98.387 %, f1: 93.344 %,elapse: 0.078 min
-  #   - [Info] The checkpoint file has been updated.
-  #   - [Info] The best valid f1 = 0.9334441438051988 .
+
+# [ Epoch 0 ]
+#   - (Training)   loss:  0.00012, accu: 83.745 %, f1: 5.085 %,elapse: 0.373 min
+#   - (Validation)   loss:  0.00005, accu: 92.263 %, f1: 9.173 %,elapse: 0.074 min
+#     - [Info] The checkpoint file has been updated.
+# [ Epoch 1 ]
+#   - (Training)   loss:  0.00004, accu: 92.559 %, f1: 12.460 %,elapse: 0.367 min
+#   - (Validation)   loss:  0.00003, accu: 93.515 %, f1: 16.028 %,elapse: 0.071 min
+#     - [Info] The checkpoint file has been updated.
+#     - [Info] The best valid f1 = 0.16028091927282956 .

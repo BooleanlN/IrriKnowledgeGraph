@@ -15,8 +15,12 @@ class my_model(nn.Module):
         self.bert_pretrained_model.to('cuda')
 
         self.hidden_size= self.bert_pretrained_model.config.hidden_size
+
         self.tanh=nn.Tanh()
+
         self.project_layer=nn.Linear(self.hidden_size,out_classes)
+
+
 
 
 
@@ -33,8 +37,10 @@ class my_model(nn.Module):
 
         # We have encoded our input sequence in a FloatTensor of shape (batch size, sequence length, model hidden dimension)
 
+
         output=self.project_layer(encoded_layers)
         #(batch size, sequence length, out_class)
+
         return output
 #
 # if __name__ == '__main__':

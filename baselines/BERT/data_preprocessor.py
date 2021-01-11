@@ -126,13 +126,13 @@ def main():
     ''' Main function '''
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-train_src', default='../datasets/train.char.bmes')
-    parser.add_argument('-valid_src', default='../datasets/dev.char.bmes')
-    parser.add_argument('-test_src', default='../datasets/test.char.bmes')
+    parser.add_argument('-train_src', default='../../datasets/train.char.bmes')
+    parser.add_argument('-valid_src', default='../../datasets/valid.char.bmes')
+    parser.add_argument('-test_src', default='../../datasets/test.char.bmes')
     parser.add_argument('-save_data', default='process_data.pth')
     parser.add_argument('-max_len', '--max_word_seq_len', type=int, default=50)
     parser.add_argument('-min_word_count', type=int, default=1)
-    parser.add_argument('-keep_case', default=False)  # 区分大小写
+    parser.add_argument('-keep_case', default=False)  # 是否区分大小写
     parser.add_argument('-share_vocab', action='store_true')
     parser.add_argument('-vocab', default=None)
 
@@ -156,6 +156,8 @@ def main():
         train_words_idx = train_words_idx[:min_inst_count]
         train_labels_idx = train_labels_idx[:min_inst_count]
 
+    # Sample out
+    print('[Sample Out] train words {} train labels {} '.format(train_words_idx[0],train_labels_idx[0]))
 
     # #- Remove empty instances
     # train_words_idx, train_labels_idx = list(zip(*[
